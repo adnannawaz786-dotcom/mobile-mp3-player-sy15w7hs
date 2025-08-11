@@ -3,12 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Music, MoreVertical, Play, Trash2, Edit } from 'lucide-react';
 import Layout from '../components/Layout';
 import { AudioContext } from '../lib/audioContext';
-import { getPlaylists, createPlaylist, deletePlaylist, updatePlaylist, getTracksFromPlaylist } from '../lib/storage';
+import { 
+  getPlaylists, 
+  createPlaylist, 
+  deletePlaylist, 
+  updatePlaylist, 
+  getPlaylistTracks 
+} from '../lib/storage';
 
 export default function Playlists() {
   const [playlists, setPlaylists] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showAddTracksModal, setShowAddTracksModal] = useState(false);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [newPlaylistName, setNewPlaylistName] = useState('');
   const [editingPlaylist, setEditingPlaylist] = useState(null);
@@ -47,7 +52,7 @@ export default function Playlists() {
   const handleUpdatePlaylist = (e) => {
     e.preventDefault();
     if (newPlaylistName.trim() && editingPlaylist) {
-      updatePlaylist(editingPlaylist.id, { name: newPlaylistName.trim() });
+      updatePlaylist({ id: editingPlaylist.id, name: newPlaylistName.trim() });
       setPlaylists(prev => prev.map(p => 
         p.id === editingPlaylist.id 
           ? { ...p, name: newPlaylistName.trim() }
@@ -60,14 +65,14 @@ export default function Playlists() {
   };
 
   const handlePlayPlaylist = (playlist) => {
-    const tracks = getTracksFromPlaylist(playlist.id);
+    const tracks = getPlaylistTracks(playlist.id);
     if (tracks.length > 0) {
       playTrack(tracks[0]);
     }
   };
 
   const PlaylistCard = ({ playlist }) => {
-    const tracks = getTracksFromPlaylist(playlist.id);
+    const tracks = getPlaylistTracks(playlist.id);
     
     return (
       <motion.div
